@@ -1,0 +1,31 @@
+name: Update access
+
+on:
+  workflow_dispatch:
+    inputs:
+      content:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write access
+        run: |
+          cat > auth.json <<'EOF'
+          ${{ inputs.content }}
+          EOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add auth.json
+          git commit -m "chore: update access" || exit 0
+          git push
